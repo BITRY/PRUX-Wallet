@@ -3,12 +3,12 @@
 ![Prux](https://i.ibb.co/Nt8sQGc/prux-logo.png)
 
 PRUX-Coin is a Cryptocurrency (similar to Bitcoin or Litecoin) 
-but with very fast transaction time of 9 seconds!!! 
+but with fast transaction time of 27 seconds!!! 
 PRUX is mineable along the Proof of work consensus mechanism, algorithme is scrypt. 
-In addition PRUX is a very rare Altcoin. Fast Blocks, all 9 second, fast tx are possible. 
-For a normal broadcast less than a minute. PRUX was developed because we were / are sorry for the eternal wait in a transaction. 
-In addition, PRUX has only very few coins per new mined block, so it is very rare. 
-On 20.01.2041 we have calculated total of 114375 PRUX mined!!!
+In addition PRUX is a very rare Altcoin. Fast Blocks, all 27 second, instant tx are possible. 
+For a normal broadcast less than minutes. PRUX was developed because we were / are sorry for the eternal wait in a transaction. 
+In addition, PRUX has only very few coins per new mined block, so it is very very very rare. 
+On 31.??.2??? we have calculated total of 114375 PRUX mined!!!
 
 - **Website:** [prux.info.](https://prux.info)
 
