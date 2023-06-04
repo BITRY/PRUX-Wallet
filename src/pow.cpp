@@ -28,7 +28,7 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
 
 	
      if (pindexLast->nHeight >= 20539595) {
-    nTargetTimespan = 16 * 27; 
+    nTargetTimespan = 2 * 27; 
     nTargetSpacing = 27; 
     nInterval = nTargetTimespan / nTargetSpacing;
     nReTargetHistoryFact = 2;  
