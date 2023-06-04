@@ -19,7 +19,10 @@ int64_t nActualTimespan = pindexLast->GetBlockTime() - nFirstBlockTime;
 int64_t nReTargetHistoryFact = 6;
 int64_t nTargetTimespan = 60 * 6; 
 
-        if (pindexLast->nHeight >= 20539595) {
+        if (pindexLast->nHeight >= 20718300) {
+        nReTargetHistoryFact = 2;
+        nTargetTimespan = 2 * 27;		
+    } else if (pindexLast->nHeight >= 20539595) {
         nReTargetHistoryFact = 2;
         nTargetTimespan = 16 * 27;
     } else if (pindexLast->nHeight >= 7770000) {
