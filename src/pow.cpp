@@ -26,9 +26,14 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
     int64_t nInterval = nTargetTimespan / nTargetSpacing;	
     int64_t nReTargetHistoryFact = 2;
 
-	
-     if (pindexLast->nHeight >= 20539595) {
+
+     if (pindexLast->nHeight >= 20718300) {
     nTargetTimespan = 2 * 27; 
+    nTargetSpacing = 27; 
+    nInterval = nTargetTimespan / nTargetSpacing;
+    nReTargetHistoryFact = 2; 
+    } else if (pindexLast->nHeight >= 20539595) {
+    nTargetTimespan = 16 * 27; 
     nTargetSpacing = 27; 
     nInterval = nTargetTimespan / nTargetSpacing;
     nReTargetHistoryFact = 2;  
@@ -97,7 +102,10 @@ int64_t nActualTimespan = pindexLast->GetBlockTime() - nFirstBlockTime;
 int64_t nReTargetHistoryFact = 2;
 int64_t nTargetTimespan = 60 * 6; // PruxCoin: 1 hours
 
-        if (pindexLast->nHeight >= 20539595) {
+        if (pindexLast->nHeight >= 20718300) {
+        nReTargetHistoryFact = 2;
+        nTargetTimespan = 2 * 27;
+    } else if (pindexLast->nHeight >= 20539595) {
         nReTargetHistoryFact = 2;
         nTargetTimespan = 16 * 27;
     } else if (pindexLast->nHeight >= 7770000) {
