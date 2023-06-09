@@ -33,7 +33,6 @@ jobs:
           - i686-win
           - x86_64-linux-dbg
           - x86_64-linux-nowallet
-          - x86_64-macos
           - x86_64-win
         include:
           - name: i686-linux
@@ -94,15 +93,7 @@ jobs:
             dep-opts: ""
             config-opts: "--enable-reduce-exports --enable-gui=qt5"
             goal: install
-          - name: x86_64-macos
-            host: x86_64-apple-darwin11
-            os: ubuntu-18.04
-            packages: cmake imagemagick libcap-dev librsvg2-bin libz-dev libtiff-tools libtinfo5 python3-setuptools xorriso libtinfo5
-            run-tests: false
-            dep-opts: ""
-            config-opts: "--enable-gui=qt5 --enable-reduce-exports"
-            goal: deploy
-            sdk: 10.11
+
 
     runs-on: ${{ matrix.os }}
 
@@ -137,8 +128,6 @@ jobs:
         run: |
           mkdir -p ./depends/sdk-sources
           mkdir -p ./depends/SDKs
-          curl --location --fail $SDK_URL/MacOSX${{ matrix.sdk }}.sdk.tar.gz -o depends/sdk-sources/MacOSX${{ matrix.sdk }}.sdk.tar.gz
-          tar -C depends/SDKs -xf depends/sdk-sources/MacOSX${{ matrix.sdk }}.sdk.tar.gz
       - name: Dependency cache
         uses: actions/cache@v2
         env:
