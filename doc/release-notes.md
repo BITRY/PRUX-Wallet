@@ -1,6 +1,6 @@
-Prux Core version 3.0.0 is now available from:
+Prux Core version 5.1.0 is now available from:
 
-  <https://github.com/BITRY/PRUX-Wallet/releases/tag/v3.0.0/>
+  <https://github.com/BITRY/PRUX-Wallet/releases/tag/v5.1.0/>
 
 This is a new minor version release, including various bugfixes and performance improvements. It is a recommended
 update for all users.
