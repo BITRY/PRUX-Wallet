@@ -26,6 +26,10 @@ signature must start with `QRPOS`.
 The wallet exposes a `stakeprux` RPC to start staking with the current
 balance.  The same functionality is available through the Qt wallet
 interface.
+Staking can be halted again via the `stopstaking` RPC, and the current
+status may be queried with `isstaking`.
+Staking can be disabled with the `stopstaking` RPC and the current
+status checked via `isstaking`.
 
 To accommodate more transactions per block, the default maximum block
 size is **9,590,000 bytes**.

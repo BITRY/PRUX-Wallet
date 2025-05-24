@@ -1,4 +1,4 @@
-name: '[FULL]'
+name: '[FULL] ubuntu-22.04'
 
 on: [push]
 

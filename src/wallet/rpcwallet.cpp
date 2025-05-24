@@ -2105,12 +2105,66 @@ UniValue stakeprux(const JSONRPCRequest& request)
             "\nExamples:\n"
             + HelpExampleCli("stakeprux", "") +
             "\nAs a json rpc call\n" +
+    { "wallet",             "stopstaking",             &stopstaking,
+   true,   {} },
+    { "wallet",             "isstaking",               &isstaking,
+   true,   {} },
             HelpExampleRpc("stakeprux", "")
         );
+    { "wallet",             "stopstaking",             &stopstaking,
+   true,   {} },
+    { "wallet",             "isstaking",               &isstaking,
+   true,   {} },
 
     EnsureWalletIsUnlocked();
     StartStaking();
     return UniValue("started");
+}
+
+UniValue stopstaking(const JSONRPCRequest& request)
+{
+    if (!EnsureWalletIsAvailable(request.fHelp))
+        return NullUniValue;
+
+    if (request.fHelp || request.params.size() != 0)
+        throw runtime_error(
+            "stopstaking\n"
+            "\nDisable staking of PRUX blocks.\n"
+
+            "\nStop staking PRUX with the wallet's available balance.\n"
+            "\nResult:\n"
+            "\"stopped\" (string) if staking was disabled\n"
+            "\nExamples:\n"
+            + HelpExampleCli("stopstaking", "") +
+            "\nAs a json rpc call\n" +
+            HelpExampleRpc("stopstaking", "")
+        );
+
+    StopStaking();
+    return UniValue("stopped");
+}
+
+UniValue isstaking(const JSONRPCRequest& request)
+{
+    if (!EnsureWalletIsAvailable(request.fHelp))
+        return NullUniValue;
+
+    if (request.fHelp || request.params.size() != 0)
+        throw runtime_error(
+            "isstaking\n"
+            "\nReturns whether the wallet is currently staking.\n"
+            "\nResult:\n"
+            "true|false\n"
+            "\nReturns true if the wallet is currently staking.\n"
+            "\nResult:\n"
+            "true|false (boolean)\n"
+            "\nExamples:\n"
+            + HelpExampleCli("isstaking", "") +
+            "\nAs a json rpc call\n" +
+            HelpExampleRpc("isstaking", "")
+        );
+
+    return UniValue(IsStaking());
 }
 
 
@@ -3093,6 +3147,10 @@ static const CRPCCommand commands[] =
     { "wallet",             "signmessage",              &signmessage,              true,   {"address","message"} },
     { "wallet",             "walletlock",               &walletlock,               true,   {} },
     { "wallet",             "stakeprux",               &stakeprux,
+   true,   {} },
+    { "wallet",             "stopstaking",             &stopstaking,
+   true,   {} },
+    { "wallet",             "isstaking",               &isstaking,
    true,   {} },
     { "wallet",             "walletpassphrasechange",   &walletpassphrasechange,   true,   {"oldpassphrase","newpassphrase"} },
     { "wallet",             "walletpassphrase",         &walletpassphrase,         true,   {"passphrase","timeout"} },
