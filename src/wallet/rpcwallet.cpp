@@ -2130,6 +2130,8 @@ UniValue stopstaking(const JSONRPCRequest& request)
         throw runtime_error(
             "stopstaking\n"
             "\nDisable staking of PRUX blocks.\n"
+
+            "\nStop staking PRUX with the wallet's available balance.\n"
             "\nResult:\n"
             "\"stopped\" (string) if staking was disabled\n"
             "\nExamples:\n"
@@ -2153,6 +2155,9 @@ UniValue isstaking(const JSONRPCRequest& request)
             "\nReturns whether the wallet is currently staking.\n"
             "\nResult:\n"
             "true|false\n"
+            "\nReturns true if the wallet is currently staking.\n"
+            "\nResult:\n"
+            "true|false (boolean)\n"
             "\nExamples:\n"
             + HelpExampleCli("isstaking", "") +
             "\nAs a json rpc call\n" +
