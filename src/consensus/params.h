@@ -84,6 +84,9 @@ struct Params {
     /** Block height at which a temporary switch to PoS is activated. A value of
      * 0 disables the feature. */
     uint32_t nPoSSwitchHeight = 0;
+
+    /** Block height at which the quantum‑resistant PoS algorithm starts. */
+    uint32_t nPoSQuantumHeight = 0;
     uint32_t nHeightEffective; // When these parameters come into use
     struct Params *pLeft = nullptr;      // Left hand branch
     struct Params *pRight = nullptr;     // Right hand branch

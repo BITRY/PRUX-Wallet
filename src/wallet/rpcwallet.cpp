@@ -2091,6 +2091,28 @@ UniValue walletlock(const JSONRPCRequest& request)
     return NullUniValue;
 }
 
+UniValue stakeprux(const JSONRPCRequest& request)
+{
+    if (!EnsureWalletIsAvailable(request.fHelp))
+        return NullUniValue;
+
+    if (request.fHelp || request.params.size() != 0)
+        throw runtime_error(
+            "stakeprux\n"
+            "\nBegin staking PRUX with the wallet's available balance.\n"
+            "\nResult:\n"
+            "\"started\" (string) if staking was enabled\n"
+            "\nExamples:\n"
+            + HelpExampleCli("stakeprux", "") +
+            "\nAs a json rpc call\n" +
+            HelpExampleRpc("stakeprux", "")
+        );
+
+    EnsureWalletIsUnlocked();
+    StartStaking();
+    return UniValue("started");
+}
+
 
 UniValue encryptwallet(const JSONRPCRequest& request)
 {
@@ -3070,6 +3092,8 @@ static const CRPCCommand commands[] =
     { "wallet",             "settxfee",                 &settxfee,                 true,   {"amount"} },
     { "wallet",             "signmessage",              &signmessage,              true,   {"address","message"} },
     { "wallet",             "walletlock",               &walletlock,               true,   {} },
+    { "wallet",             "stakeprux",               &stakeprux,
+   true,   {} },
     { "wallet",             "walletpassphrasechange",   &walletpassphrasechange,   true,   {"oldpassphrase","newpassphrase"} },
     { "wallet",             "walletpassphrase",         &walletpassphrase,         true,   {"passphrase","timeout"} },
     { "wallet",             "removeprunedfunds",        &removeprunedfunds,        true,   {"txid"} },

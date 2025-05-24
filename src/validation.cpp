@@ -207,12 +207,19 @@ public:
 /** Simple Proof-of-Stake check used for the PoS switch block. The coinbase
  *  transaction must start with the ASCII string "POS". */
 static bool CheckProofOfStake(const CBlock& block)
+=======
+/** Simple Proof‑of‑Stake check. The stake signature must start with
+ *  "POS". When the quantum‑resistant upgrade is active, it must start
+ *  with "QRPOS" instead. */
+static bool CheckProofOfStake(const CBlock& block, bool fQuantum)
 {
     if (block.vtx.empty() || block.vtx[0]->vin.empty())
         return false;
 
     const CScript& sig = block.vtx[0]->vin[0].scriptSig;
     std::string data(sig.begin(), sig.end());
+    if (fQuantum)
+        return data.rfind("QRPOS", 0) == 0;
     return data.rfind("POS", 0) == 0;
 }
 
@@ -1191,6 +1198,7 @@ static bool ReadBlockOrHeader(T& block, const CBlockIndex* pindex, const Consens
     bool check = fCheckPOW;
     if (fCheckPOW && consensusParams.nPoSSwitchHeight != 0 &&
         pindex->nHeight == (int)consensusParams.nPoSSwitchHeight + 1)
+        pindex->nHeight >= (int)consensusParams.nPoSSwitchHeight + 1)
         check = false;
 
     if (!ReadBlockOrHeader(block, pindex->GetBlockPos(), consensusParams, check))
@@ -3054,6 +3062,18 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
         consensusParams.nPoSSwitchHeight != 0) {
         if (!CheckProofOfStake(block))
             return state.DoS(100, false, REJECT_INVALID, "bad-pos", false, "incorrect proof of stake");
+    // Check proof of work or proof of stake after the switch height
+    bool fPoSActive = consensusParams.nPoSSwitchHeight != 0 &&
+                      nHeight >= (int)consensusParams.nPoSSwitchHeight + 1;
+    if (fPoSActive) {
+        bool fQuantum = consensusParams.nPoSQuantumHeight != 0 &&
+                        nHeight >= (int)consensusParams.nPoSQuantumHeight;
+        if (!CheckProofOfStake(block, fQuantum))
+            return state.DoS(100, false, REJECT_INVALID,
+                             fQuantum ? "bad-qrpos" : "bad-pos",
+                             false,
+                             fQuantum ? "incorrect quantum pos signature" :
+                                        "incorrect proof of stake");
     } else {
         if (block.nBits != GetNextWorkRequired(pindexPrev, &block, consensusParams))
             return state.DoS(100, false, REJECT_INVALID, "bad-diffbits", false, "incorrect proof of work");

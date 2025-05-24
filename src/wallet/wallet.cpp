@@ -42,6 +42,22 @@ unsigned int nTxConfirmTarget = DEFAULT_TX_CONFIRM_TARGET;
 bool bSpendZeroConfChange = DEFAULT_SPEND_ZEROCONF_CHANGE;
 bool fSendFreeTransactions = DEFAULT_SEND_FREE_TRANSACTIONS;
 bool fWalletRbf = DEFAULT_WALLET_RBF;
+bool fStakingActive = false;
+
+void StartStaking()
+{
+    fStakingActive = true;
+}
+
+void StopStaking()
+{
+    fStakingActive = false;
+}
+
+bool IsStaking()
+{
+    return fStakingActive;
+}
 
 const char * DEFAULT_WALLET_DAT = "wallet.dat";
 const uint32_t BIP32_HARDENED_KEY_LIMIT = 0x80000000;
