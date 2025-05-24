@@ -17,6 +17,19 @@ This is controlled by the `nPoSSwitchHeight` consensus parameter.  For that
 block, proof-of-work validation is skipped and the coinbase transaction must
 start with `POS`.
 
+### Additional staking features
+
+Blocks at height **20,000,002** and above use a quantum-resistant
+Proof-of-Stake algorithm.  When this upgrade is active, the coinbase
+signature must start with `QRPOS`.
+
+The wallet exposes a `stakeprux` RPC to start staking with the current
+balance.  The same functionality is available through the Qt wallet
+interface.
+
+To accommodate more transactions per block, the default maximum block
+size is **9,590,000 bytes**.
+
 - **Website:** [prux.info.](https://prux.info)
 
 ## License 
