@@ -2113,6 +2113,47 @@ UniValue stakeprux(const JSONRPCRequest& request)
     return UniValue("started");
 }
 
+UniValue stopstaking(const JSONRPCRequest& request)
+{
+    if (!EnsureWalletIsAvailable(request.fHelp))
+        return NullUniValue;
+
+    if (request.fHelp || request.params.size() != 0)
+        throw runtime_error(
+            "stopstaking\n"
+            "\nStop staking PRUX.\n"
+            "\nResult:\n"
+            "\"stopped\" (string) if staking was disabled\n"
+            "\nExamples:\n"
+            + HelpExampleCli("stopstaking", "") +
+            "\nAs a json rpc call\n" +
+            HelpExampleRpc("stopstaking", "")
+        );
+
+    StopStaking();
+    return UniValue("stopped");
+}
+
+UniValue isstaking(const JSONRPCRequest& request)
+{
+    if (!EnsureWalletIsAvailable(request.fHelp))
+        return NullUniValue;
+
+    if (request.fHelp || request.params.size() != 0)
+        throw runtime_error(
+            "isstaking\n"
+            "\nReturn whether staking is currently active.\n"
+            "\nResult:\n"
+            "true or false\n"
+            "\nExamples:\n"
+            + HelpExampleCli("isstaking", "") +
+            "\nAs a json rpc call\n" +
+            HelpExampleRpc("isstaking", "")
+        );
+
+    return UniValue(IsStaking());
+}
+
 
 UniValue encryptwallet(const JSONRPCRequest& request)
 {
@@ -3093,6 +3134,10 @@ static const CRPCCommand commands[] =
     { "wallet",             "signmessage",              &signmessage,              true,   {"address","message"} },
     { "wallet",             "walletlock",               &walletlock,               true,   {} },
     { "wallet",             "stakeprux",               &stakeprux,
+   true,   {} },
+    { "wallet",             "stopstaking",             &stopstaking,
+   true,   {} },
+    { "wallet",             "isstaking",               &isstaking,
    true,   {} },
     { "wallet",             "walletpassphrasechange",   &walletpassphrasechange,   true,   {"oldpassphrase","newpassphrase"} },
     { "wallet",             "walletpassphrase",         &walletpassphrase,         true,   {"passphrase","timeout"} },
