@@ -454,6 +454,19 @@ bool WalletModel::backupWallet(const QString &filename)
     return wallet->BackupWallet(filename.toLocal8Bit().data());
 }
 
+bool WalletModel::setStakingEnabled(bool enabled)
+{
+    LOCK(wallet->cs_wallet);
+    wallet->SetStaking(enabled);
+    return wallet->IsStaking();
+}
+
+bool WalletModel::getStakingEnabled() const
+{
+    LOCK(wallet->cs_wallet);
+    return wallet->IsStaking();
+}
+
 // Handlers for core signals
 static void NotifyKeyStoreStatusChanged(WalletModel *walletmodel, CCryptoKeyStore *wallet)
 {

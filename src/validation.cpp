@@ -42,6 +42,7 @@
 
 #include <atomic>
 #include <sstream>
+#include <string>
 
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/join.hpp>
@@ -202,6 +203,26 @@ public:
         conflictedTxs.clear();
     }
 };
+
+/** Simple Proof-of-Stake check used for PoS blocks.
+ *  For the initial PoS period the coinbase signature must start with
+ *  "POS" while after the quantum resistant upgrade it must start with
+ *  "QRPOS". */
+static bool CheckProofOfStake(const CBlock& block,
+                              const Consensus::Params& params,
+                              int nHeight)
+{
+    if (block.vtx.empty() || block.vtx[0]->vin.empty())
+        return false;
+
+    const CScript& sig = block.vtx[0]->vin[0].scriptSig;
+    std::string data(sig.begin(), sig.end());
+
+    if (params.nQRPosHeight != 0 && nHeight >= (int)params.nQRPosHeight)
+        return data.rfind("QRPOS", 0) == 0;
+
+    return data.rfind("POS", 0) == 0;
+}
 
 CBlockIndex* FindForkInGlobalIndex(const CChain& chain, const CBlockLocator& locator)
 {
@@ -1175,7 +1196,12 @@ static bool ReadBlockOrHeader(T& block, const CDiskBlockPos& pos, const Consensu
 template<typename T>
 static bool ReadBlockOrHeader(T& block, const CBlockIndex* pindex, const Consensus::Params& consensusParams, bool fCheckPOW)
 {
-    if (!ReadBlockOrHeader(block, pindex->GetBlockPos(), consensusParams, fCheckPOW))
+    bool check = fCheckPOW;
+    if (fCheckPOW && consensusParams.nPoSSwitchHeight != 0 &&
+        pindex->nHeight >= (int)consensusParams.nPoSSwitchHeight + 1)
+        check = false;
+
+    if (!ReadBlockOrHeader(block, pindex->GetBlockPos(), consensusParams, check))
         return false;
     if (block.GetHash() != pindex->GetBlockHash())
         return error("ReadBlockOrHeader(CBlock&, CBlockIndex*): GetHash() doesn't match index for %s at %s",
@@ -3031,9 +3057,15 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
         return state.DoS(1, error("%s: forked chain older than max reorganization depth (height %d), with connections (count %d), and (initial download %s)", __func__, nHeight, g_connman ? g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL) : -1, IsInitialBlockDownload() ? "true" : "false"), REJECT_MAXREORGDEPTH, "bad-fork-prior-to-maxreorgdepth");
     
 
-    // Check proof of work
-    if (block.nBits != GetNextWorkRequired(pindexPrev, &block, consensusParams))
-        return state.DoS(100, false, REJECT_INVALID, "bad-diffbits", false, "incorrect proof of work");
+    // Check proof of work or proof of stake depending on height
+    if (consensusParams.nPoSSwitchHeight != 0 &&
+        nHeight >= (int)consensusParams.nPoSSwitchHeight + 1) {
+        if (!CheckProofOfStake(block, consensusParams, nHeight))
+            return state.DoS(100, false, REJECT_INVALID, "bad-pos", false, "incorrect proof of stake");
+    } else {
+        if (block.nBits != GetNextWorkRequired(pindexPrev, &block, consensusParams))
+            return state.DoS(100, false, REJECT_INVALID, "bad-diffbits", false, "incorrect proof of work");
+    }
 
     // Check timestamp against prev
     if (block.GetBlockTime() <= pindexPrev->GetMedianTimePast())

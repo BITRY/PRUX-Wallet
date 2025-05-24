@@ -98,6 +98,8 @@ public Q_SLOTS:
     void changePassphrase();
     /** Ask for passphrase to unlock wallet temporarily */
     void unlockWallet();
+    /** Toggle staking in the wallet */
+    void stakePrux();
     /** Open the print paper wallets dialog **/
     void printPaperWallets();
 

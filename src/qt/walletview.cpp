@@ -282,6 +282,16 @@ void WalletView::unlockWallet()
     }
 }
 
+void WalletView::stakePrux()
+{
+    if (!walletModel)
+        return;
+    bool newState = !walletModel->getStakingEnabled();
+    walletModel->setStakingEnabled(newState);
+    QString msg = newState ? tr("Staking enabled") : tr("Staking disabled");
+    Q_EMIT message(tr("Stake PRUX"), msg, CClientUIInterface::MSG_INFORMATION);
+}
+
 void WalletView::usedSendingAddresses()
 {
     if(!walletModel)

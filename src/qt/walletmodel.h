@@ -167,6 +167,9 @@ public:
     // Wallet backup
     bool backupWallet(const QString &filename);
 
+    bool setStakingEnabled(bool enabled);
+    bool getStakingEnabled() const;
+
     // RAI object for unlocking wallet, returned by requestUnlock()
     class UnlockContext
     {

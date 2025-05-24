@@ -81,6 +81,11 @@ struct Params {
     bool fAllowLegacyBlocks;
 
     /** Height-aware consensus parameters */
+    /** Block height at which a temporary switch to PoS is activated. A value of
+     * 0 disables the feature. */
+    uint32_t nPoSSwitchHeight = 0;
+    /** Height at which quantum-resistant PoS rules activate. 0 disables. */
+    uint32_t nQRPosHeight = 0;
     uint32_t nHeightEffective; // When these parameters come into use
     struct Params *pLeft = nullptr;      // Left hand branch
     struct Params *pRight = nullptr;     // Right hand branch

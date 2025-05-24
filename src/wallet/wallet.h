@@ -512,6 +512,7 @@ private:
     int64_t nNextResend;
     int64_t nLastResend;
     bool fBroadcastTransactions;
+    bool fStakingEnabled;
 
     /**
      * Used to keep track of spent outpoints, and
@@ -609,6 +610,7 @@ public:
         nLastResend = 0;
         nTimeFirstKey = 0;
         fBroadcastTransactions = false;
+        fStakingEnabled = false;
     }
 
     std::map<uint256, CWalletTx> mapWallet;
@@ -884,6 +886,10 @@ public:
     bool GetBroadcastTransactions() const { return fBroadcastTransactions; }
     /** Set whether this wallet broadcasts transactions. */
     void SetBroadcastTransactions(bool broadcast) { fBroadcastTransactions = broadcast; }
+    /** Return current staking status. */
+    bool IsStaking() const { return fStakingEnabled; }
+    /** Enable or disable staking. */
+    void SetStaking(bool enable) { fStakingEnabled = enable; }
 
     /* Mark a transaction (and it in-wallet descendants) as abandoned so its inputs may be respent. */
     bool AbandonTransaction(const uint256& hashTx);

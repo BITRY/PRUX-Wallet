@@ -1902,6 +1902,25 @@ UniValue backupwallet(const JSONRPCRequest& request)
     return NullUniValue;
 }
 
+UniValue stakeprux(const JSONRPCRequest& request)
+{
+    if (!EnsureWalletIsAvailable(request.fHelp))
+        return NullUniValue;
+
+    if (request.fHelp || request.params.size() != 1)
+        throw runtime_error(
+            "stakeprux \"enable\"\n"
+            "\nEnable or disable staking in the wallet.\n"
+            "\nArguments:\n"
+            "1. enable  (boolean) true to enable staking, false to disable\n"
+        );
+
+    bool enable = request.params[0].get_bool();
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+    pwalletMain->SetStaking(enable);
+    return UniValue(enable);
+}
+
 
 UniValue keypoolrefill(const JSONRPCRequest& request)
 {
@@ -3069,6 +3088,8 @@ static const CRPCCommand commands[] =
     { "wallet",             "setaccount",               &setaccount,               true,   {"address","account"} },
     { "wallet",             "settxfee",                 &settxfee,                 true,   {"amount"} },
     { "wallet",             "signmessage",              &signmessage,              true,   {"address","message"} },
+    { "wallet",             "stakeprux",               &stakeprux,
+   true,   {"enable"} },
     { "wallet",             "walletlock",               &walletlock,               true,   {} },
     { "wallet",             "walletpassphrasechange",   &walletpassphrasechange,   true,   {"oldpassphrase","newpassphrase"} },
     { "wallet",             "walletpassphrase",         &walletpassphrase,         true,   {"passphrase","timeout"} },

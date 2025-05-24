@@ -179,6 +179,13 @@ void WalletFrame::unlockWallet()
         walletView->unlockWallet();
 }
 
+void WalletFrame::stakePrux()
+{
+    WalletView *walletView = currentWalletView();
+    if (walletView)
+        walletView->stakePrux();
+}
+
 void WalletFrame::printPaperWallets()
 {
     WalletView *walletView = currentWalletView();
