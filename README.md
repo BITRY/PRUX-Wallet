@@ -27,6 +27,13 @@ The wallet exposes a `stakeprux` RPC to begin staking with the
 available balance. Staking can be stopped via `stopstaking`, and the
 `isstaking` RPC returns the current status. These features are also
 accessible through the Qt wallet interface.
+The wallet exposes a `stakeprux` RPC to start staking with the current
+balance.  The same functionality is available through the Qt wallet
+interface.
+Staking can be halted again via the `stopstaking` RPC, and the current
+status may be queried with `isstaking`.
+Staking can be disabled with the `stopstaking` RPC and the current
+status checked via `isstaking`.
 
 To accommodate more transactions per block, the default maximum block
 size is **9,590,000 bytes**.
