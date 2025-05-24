@@ -2105,8 +2105,16 @@ UniValue stakeprux(const JSONRPCRequest& request)
             "\nExamples:\n"
             + HelpExampleCli("stakeprux", "") +
             "\nAs a json rpc call\n" +
+    { "wallet",             "stopstaking",             &stopstaking,
+   true,   {} },
+    { "wallet",             "isstaking",               &isstaking,
+   true,   {} },
             HelpExampleRpc("stakeprux", "")
         );
+    { "wallet",             "stopstaking",             &stopstaking,
+   true,   {} },
+    { "wallet",             "isstaking",               &isstaking,
+   true,   {} },
 
     EnsureWalletIsUnlocked();
     StartStaking();
@@ -2121,6 +2129,8 @@ UniValue stopstaking(const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() != 0)
         throw runtime_error(
             "stopstaking\n"
+            "\nDisable staking of PRUX blocks.\n"
+
             "\nStop staking PRUX with the wallet's available balance.\n"
             "\nResult:\n"
             "\"stopped\" (string) if staking was disabled\n"
@@ -2142,6 +2152,9 @@ UniValue isstaking(const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() != 0)
         throw runtime_error(
             "isstaking\n"
+            "\nReturns whether the wallet is currently staking.\n"
+            "\nResult:\n"
+            "true|false\n"
             "\nReturns true if the wallet is currently staking.\n"
             "\nResult:\n"
             "true|false (boolean)\n"
