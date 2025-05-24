@@ -10,6 +10,13 @@ For a normal broadcast less than minutes. PRUX was developed because we were / a
 In addition, PRUX has only very few coins per new mined block, so it is very very very rare. 
 On 31.??.2??? we have calculated total of 114375 PRUX mined!!!
 
+## Temporary Proof-of-Stake fork
+
+At height **20,000,001** the chain produces a single Proof-of-Stake block.
+This is controlled by the `nPoSSwitchHeight` consensus parameter.  For that
+block, proof-of-work validation is skipped and the coinbase transaction must
+start with `POS`.
+
 - **Website:** [prux.info.](https://prux.info)
 
 ## License 

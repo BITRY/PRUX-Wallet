@@ -204,6 +204,10 @@ public:
     }
 };
 
+/** Simple Proof-of-Stake check used for the PoS switch block. The coinbase
+ *  transaction must start with the ASCII string "POS". */
+static bool CheckProofOfStake(const CBlock& block)
+=======
 /** Simple Proof‑of‑Stake check. The stake signature must start with
  *  "POS". When the quantum‑resistant upgrade is active, it must start
  *  with "QRPOS" instead. */
@@ -1193,6 +1197,7 @@ static bool ReadBlockOrHeader(T& block, const CBlockIndex* pindex, const Consens
 {
     bool check = fCheckPOW;
     if (fCheckPOW && consensusParams.nPoSSwitchHeight != 0 &&
+        pindex->nHeight == (int)consensusParams.nPoSSwitchHeight + 1)
         pindex->nHeight >= (int)consensusParams.nPoSSwitchHeight + 1)
         check = false;
 
@@ -3052,6 +3057,11 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
         return state.DoS(1, error("%s: forked chain older than max reorganization depth (height %d), with connections (count %d), and (initial download %s)", __func__, nHeight, g_connman ? g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL) : -1, IsInitialBlockDownload() ? "true" : "false"), REJECT_MAXREORGDEPTH, "bad-fork-prior-to-maxreorgdepth");
     
 
+    // Check proof of work or proof of stake at the switch height
+    if (nHeight == (int)consensusParams.nPoSSwitchHeight + 1 &&
+        consensusParams.nPoSSwitchHeight != 0) {
+        if (!CheckProofOfStake(block))
+            return state.DoS(100, false, REJECT_INVALID, "bad-pos", false, "incorrect proof of stake");
     // Check proof of work or proof of stake after the switch height
     bool fPoSActive = consensusParams.nPoSSwitchHeight != 0 &&
                       nHeight >= (int)consensusParams.nPoSSwitchHeight + 1;
