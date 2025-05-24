@@ -42,6 +42,7 @@
 
 #include <atomic>
 #include <sstream>
+#include <string>
 
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/join.hpp>
@@ -202,6 +203,18 @@ public:
         conflictedTxs.clear();
     }
 };
+
+/** Simple Proof-of-Stake check used for the PoS switch block. The coinbase
+ *  transaction must start with the ASCII string "POS". */
+static bool CheckProofOfStake(const CBlock& block)
+{
+    if (block.vtx.empty() || block.vtx[0]->vin.empty())
+        return false;
+
+    const CScript& sig = block.vtx[0]->vin[0].scriptSig;
+    std::string data(sig.begin(), sig.end());
+    return data.rfind("POS", 0) == 0;
+}
 
 CBlockIndex* FindForkInGlobalIndex(const CChain& chain, const CBlockLocator& locator)
 {
@@ -1175,7 +1188,12 @@ static bool ReadBlockOrHeader(T& block, const CDiskBlockPos& pos, const Consensu
 template<typename T>
 static bool ReadBlockOrHeader(T& block, const CBlockIndex* pindex, const Consensus::Params& consensusParams, bool fCheckPOW)
 {
-    if (!ReadBlockOrHeader(block, pindex->GetBlockPos(), consensusParams, fCheckPOW))
+    bool check = fCheckPOW;
+    if (fCheckPOW && consensusParams.nPoSSwitchHeight != 0 &&
+        pindex->nHeight == (int)consensusParams.nPoSSwitchHeight + 1)
+        check = false;
+
+    if (!ReadBlockOrHeader(block, pindex->GetBlockPos(), consensusParams, check))
         return false;
     if (block.GetHash() != pindex->GetBlockHash())
         return error("ReadBlockOrHeader(CBlock&, CBlockIndex*): GetHash() doesn't match index for %s at %s",
@@ -1767,7 +1785,11 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     int64_t nTimeStart = GetTimeMicros();
 
     // Check it again in case a previous version let a bad block in
-    if (!CheckBlock(block, state, !fJustCheck, !fJustCheck))
+    bool checkPoW = !fJustCheck;
+    if (consensus.nPoSSwitchHeight != 0 &&
+        pindex->nHeight == (int)consensus.nPoSSwitchHeight + 1)
+        checkPoW = false;
+    if (!CheckBlock(block, state, checkPoW, !fJustCheck))
         return error("%s: Consensus::CheckBlock: %s", __func__, FormatStateMessage(state));
 
     // verify that the view's current state corresponds to the previous block
@@ -3031,9 +3053,15 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
         return state.DoS(1, error("%s: forked chain older than max reorganization depth (height %d), with connections (count %d), and (initial download %s)", __func__, nHeight, g_connman ? g_connman->GetNodeCount(CConnman::CONNECTIONS_ALL) : -1, IsInitialBlockDownload() ? "true" : "false"), REJECT_MAXREORGDEPTH, "bad-fork-prior-to-maxreorgdepth");
     
 
-    // Check proof of work
-    if (block.nBits != GetNextWorkRequired(pindexPrev, &block, consensusParams))
-        return state.DoS(100, false, REJECT_INVALID, "bad-diffbits", false, "incorrect proof of work");
+    // Check proof of work or proof of stake at the switch height
+    if (nHeight == (int)consensusParams.nPoSSwitchHeight + 1 &&
+        consensusParams.nPoSSwitchHeight != 0) {
+        if (!CheckProofOfStake(block))
+            return state.DoS(100, false, REJECT_INVALID, "bad-pos", false, "incorrect proof of stake");
+    } else {
+        if (block.nBits != GetNextWorkRequired(pindexPrev, &block, consensusParams))
+            return state.DoS(100, false, REJECT_INVALID, "bad-diffbits", false, "incorrect proof of work");
+    }
 
     // Check timestamp against prev
     if (block.GetBlockTime() <= pindexPrev->GetMedianTimePast())
@@ -3247,7 +3275,14 @@ static bool AcceptBlock(const std::shared_ptr<const CBlock>& pblock, CValidation
     }
     if (fNewBlock) *fNewBlock = true;
 
-    if (!CheckBlock(block, state) ||
+    bool checkPoW = true;
+    {
+        const Consensus::Params& conParams = chainparams.GetConsensus(pindex->nHeight);
+        if (conParams.nPoSSwitchHeight != 0 &&
+            pindex->nHeight == (int)conParams.nPoSSwitchHeight + 1)
+            checkPoW = false;
+    }
+    if (!CheckBlock(block, state, checkPoW, true) ||
         !ContextualCheckBlock(block, state, pindex->pprev)) {
         if (state.IsInvalid() && !state.CorruptionPossible()) {
             pindex->nStatus |= BLOCK_FAILED_VALID;
@@ -3345,7 +3380,13 @@ bool TestBlockValidity(CValidationState& state, const CChainParams& chainparams,
     // NOTE: CheckBlockHeader is called by CheckBlock
     if (!ContextualCheckBlockHeader(block, state, pindexPrev, GetAdjustedTime()))
         return error("%s: Consensus::ContextualCheckBlockHeader: %s", __func__, FormatStateMessage(state));
-    if (!CheckBlock(block, state, fCheckPOW, fCheckMerkleRoot))
+    bool checkPoW = fCheckPOW;
+    if (fCheckPOW) {
+        const Consensus::Params& conParams = chainparams.GetConsensus(indexDummy.nHeight);
+        if (conParams.nPoSSwitchHeight != 0 && indexDummy.nHeight == (int)conParams.nPoSSwitchHeight + 1)
+            checkPoW = false;
+    }
+    if (!CheckBlock(block, state, checkPoW, fCheckMerkleRoot))
         return error("%s: Consensus::CheckBlock: %s", __func__, FormatStateMessage(state));
     if (!ContextualCheckBlock(block, state, pindexPrev))
         return error("%s: Consensus::ContextualCheckBlock: %s", __func__, FormatStateMessage(state));
@@ -3723,7 +3764,12 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView *coinsview,
         if (!ReadBlockFromDisk(block, pindex, chainparams.GetConsensus(pindex->nHeight)))
             return error("VerifyDB(): *** ReadBlockFromDisk failed at %d, hash=%s", pindex->nHeight, pindex->GetBlockHash().ToString());
         // check level 1: verify block validity
-        if (nCheckLevel >= 1 && !CheckBlock(block, state))
+        bool checkPoW = true;
+        const Consensus::Params& conParams = chainparams.GetConsensus(pindex->nHeight);
+        if (conParams.nPoSSwitchHeight != 0 &&
+            pindex->nHeight == (int)conParams.nPoSSwitchHeight + 1)
+            checkPoW = false;
+        if (nCheckLevel >= 1 && !CheckBlock(block, state, checkPoW))
             return error("%s: *** found bad block at %d, hash=%s (%s)\n", __func__,
                          pindex->nHeight, pindex->GetBlockHash().ToString(), FormatStateMessage(state));
         // check level 2: verify undo validity
