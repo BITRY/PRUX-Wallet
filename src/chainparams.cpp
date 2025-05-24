@@ -120,9 +120,13 @@ public:
         consensus.fStrictChainId = true;
         consensus.fAllowLegacyBlocks = true;
         consensus.nHeightEffective = 0;
+        consensus.nPoSSwitchHeight = 20000000; // Hard fork: switch to PoS at this height
+        consensus.nPoSQuantumHeight = 20000002; // Enable quantum PoS at this height
 
         // Blocks 145000 - 371336 are Digishield without AuxPoW
         digishieldConsensus = consensus;
+        digishieldConsensus.nPoSSwitchHeight = consensus.nPoSSwitchHeight;
+        digishieldConsensus.nPoSQuantumHeight = consensus.nPoSQuantumHeight;
         digishieldConsensus.nHeightEffective = 15615200;
         digishieldConsensus.fSimplifiedRewards = true;
         digishieldConsensus.fDigishieldDifficultyCalculation = true;
@@ -131,6 +135,8 @@ public:
 
         // Blocks 371337+ are AuxPoW
         auxpowConsensus = digishieldConsensus;
+        auxpowConsensus.nPoSSwitchHeight = consensus.nPoSSwitchHeight;
+        auxpowConsensus.nPoSQuantumHeight = consensus.nPoSQuantumHeight;
         auxpowConsensus.nHeightEffective = 15615201;
         auxpowConsensus.fAllowLegacyBlocks = false;
 
