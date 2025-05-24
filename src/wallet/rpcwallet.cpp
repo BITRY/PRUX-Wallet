@@ -2129,6 +2129,7 @@ UniValue stopstaking(const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() != 0)
         throw runtime_error(
             "stopstaking\n"
+            "\nStop staking PRUX.\n"
             "\nDisable staking of PRUX blocks.\n"
 
             "\nStop staking PRUX with the wallet's available balance.\n"
@@ -2152,6 +2153,10 @@ UniValue isstaking(const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() != 0)
         throw runtime_error(
             "isstaking\n"
+            "\nReturn whether staking is currently active.\n"
+            "\nResult:\n"
+            "true or false\n"
+
             "\nReturns whether the wallet is currently staking.\n"
             "\nResult:\n"
             "true|false\n"

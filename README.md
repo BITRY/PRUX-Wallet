@@ -23,6 +23,10 @@ Blocks at height **20,000,002** and above use a quantum-resistant
 Proof-of-Stake algorithm.  When this upgrade is active, the coinbase
 signature must start with `QRPOS`.
 
+The wallet exposes a `stakeprux` RPC to begin staking with the
+available balance. Staking can be stopped via `stopstaking`, and the
+`isstaking` RPC returns the current status. These features are also
+accessible through the Qt wallet interface.
 The wallet exposes a `stakeprux` RPC to start staking with the current
 balance.  The same functionality is available through the Qt wallet
 interface.
